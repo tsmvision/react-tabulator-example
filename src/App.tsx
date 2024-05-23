@@ -32,10 +32,6 @@ const App = () => {
     // const [selectedRow, setSelectedRow] = useState<string>("");
 
     const options:ReactTabulatorOptions = {
-        rowClick: (_event, row) => {
-            console.log("row Click", row);
-
-        },
         selectable: 1,
     };
 
