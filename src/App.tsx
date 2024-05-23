@@ -4,10 +4,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-tabulator/css/bootstrap/tabulator_bootstrap.css';
 import {Col, Container, Row} from "react-bootstrap";
 import './App.module.scss';
-import {useEffect, useState} from "react";
-import {s} from "vite/dist/node/types.d-aGj9QkWt";
+import {useEffect} from "react";
 import {Tabulator} from "react-tabulator/lib/types/TabulatorTypes";
 import RowComponent = Tabulator.RowComponent;
+import {UseApp} from "./types/App.type.ts";
 
 const columns: ColumnDefinition[] = [
     { title: "Name", field: "name", width: 150 },
@@ -26,8 +26,7 @@ const data  = [
     {id:5, name:"Margret Marmajuke", age:"16", col:"yellow", dob:"31/01/1999"},
 ];
 
-const App = () => {
-
+const useApp: UseApp = () => {
     // const [selectedId, setSelectedId] = useState<number>();
     // const [selectedRow, setSelectedRow] = useState<string>("");
 
@@ -54,6 +53,21 @@ const App = () => {
     useEffect(() => {
         // console.log("selected row: ", selectedRow);
     });
+
+    return {
+        options,
+        rowClick,
+        rowSelectionChanged
+    }
+};
+
+const App = () => {
+
+    const {
+        options,
+        rowClick,
+        rowSelectionChanged
+    } = useApp();
 
     return (
         <Container fluid={true}>
