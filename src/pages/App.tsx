@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-tabulator/css/bootstrap/tabulator_bootstrap.css';
 import {Col, Container, Row} from "react-bootstrap";
 import './App.module.scss';
-import {useEffect} from "react";
+import {createRef, useEffect, useRef, useState} from "react";
 import {Tabulator} from "react-tabulator/lib/types/TabulatorTypes";
 import RowComponent = Tabulator.RowComponent;
 import {UseApp} from "./types/App.type.ts";
@@ -26,38 +26,61 @@ const data  = [
     {id:5, name:"Margret Marmajuke", age:"16", col:"yellow", dob:"31/01/1999"},
 ];
 
+type TableRef = undefined | {
+    current: typeof Tabulator
+}
+
 const useApp: UseApp = () => {
     // const [selectedId, setSelectedId] = useState<number>();
     // const [selectedRow, setSelectedRow] = useState<string>("");
+    const [selectedRowIndex, setSelectedRowIndex] = useState<number>(-1);
+    // const [merong, setMerong] = useState<number>(-1);
+    // const [selectedRowIndex2, setSelectedRowIndex2] = useState<number>(-1);
 
     const options:ReactTabulatorOptions = {
         selectable: 1,
     };
 
     const rowClick = (_event: UIEvent, row: RowComponent) => {
-        // row.deselect(selectedId);
-        // row.select()
-        // row.getElement().style.backgroundColor = 'red';
-        console.log("row clicked", row);
-        // console.log("row.getTable().getSelectedRows():", row.getTable().getSelectedRows().pop());
-        // setSelectedRow(row.getData().id);
+        const currentIndex = row?.getIndex() ?? -1;
+        setSelectedRowIndex(currentIndex);
+
+        if (selectedRowIndex !== selectedRowIndex) {
+            row.deselect();
+        }
     };
 
     const rowSelectionChanged = (_event: UIEvent, row: RowComponent) => {
         // setSelectedRow(row.id);
-        console.log("rowSelectionChanged clicked", row);
+        // console.log("rowSelectionChanged clicked", row);
+
+        // if (row?.getIndex() === selectedRowIndex) {
+        //     row.select();
+        // }
+
+        // if (row?.getIndex() !== undefined) {
+        //     setSelectedRowIndex(row.getIndex())
+        // }
+
+
+
         // console.log("table.selectedRows: ", row.getTable().getSelectedRows());
         // row.getTable().deselectRow();
+
+        // if (row.getIndex() === selectedRowIndex) {
+        //     row.select();
+        // }
     }
 
-    useEffect(() => {
-        // console.log("selected row: ", selectedRow);
-    });
+    // const selectableCheck = (row: RowComponent) => {
+    //     return row.getIndex() === selectedRowIndex;
+    // }
 
     return {
         options,
         rowClick,
-        rowSelectionChanged
+        rowSelectionChanged,
+        selectedRowIndex
     }
 };
 
@@ -66,14 +89,37 @@ const App = () => {
     const {
         options,
         rowClick,
-        rowSelectionChanged
+        rowSelectionChanged,
+        selectedRowIndex,
     } = useApp();
+
+    // @ts-expect-error
+    // const tableRef = useRef();
+    const tableRef = useRef<TableRef>(undefined);
+
+    useEffect(() => {
+        // I can now use setData in various effects:
+        // I can now use setData in various effects:
+        // console.log(tableRef);
+        if (tableRef.current !== undefined) {
+            // tableRef.deselectRow();
+            tableRef.current.selectRow(selectedRowIndex)
+            console.log("getSelectRow(): ", tableRef.current.getSelectedRows())
+        }
+        console.log("selectedRowIndex: ", selectedRowIndex);
+    }, );
+
+
+    useEffect(() => {
+        console.log(tableRef);
+    });
 
     return (
         <Container fluid={true}>
             <Row>
                 <Col>
                     <ReactTabulator
+                        onRef={(r) => (tableRef.current = r.current)}
                         data={data}
                         columns={columns}
                         layout={"fitData"}
@@ -81,7 +127,8 @@ const App = () => {
                         options={options}
                         events={{
                             rowClick,
-                            rowSelectionChanged
+                            rowSelectionChanged,
+
                         }}
                     />
                 </Col>
